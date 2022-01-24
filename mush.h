@@ -7,6 +7,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <stdarg.h>
+#include <stdbool.h>
 
 // Numeric constants
 #define ERR_LEN 256
@@ -22,5 +23,6 @@ void tokenize(char **, char *);
 void processInput(char **);
 void forkAndExec(char **);
 void changeDirectory(char *);
+bool timeToExit(char *);
 
 #endif

@@ -54,7 +54,12 @@ void changeDirectory(char * newDir) {
     }
 }
 
+bool timeToExit(char * command) {
+    return strcmp(command, EXIT) == 0 || feof(stdin) != 0;
+}
+
 int main(void) {
+    // printf("%s", PROMPT);
     while(1) {
         printf("%s", PROMPT);
         char * arguments[128];
@@ -63,13 +68,16 @@ int main(void) {
 
         if(program == NULL)
             continue;
-        if(strcmp(program, EXIT) == 0 || feof(stdin) != 0)
+        if(timeToExit(program)) {
             exit(0);
+        }
         else if(strcmp(program, CHDIR) == 0) {
             char * path = arguments[1];
             changeDirectory(path);
         }
-        else
+        else{
             forkAndExec(arguments);
+        }
+        printf("%s", PROMPT);
     }
 }
