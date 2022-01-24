@@ -63,7 +63,7 @@ int main(void) {
 
         if(program == NULL)
             continue;
-        if(strcmp(program, EXIT) == 0)
+        if(strcmp(program, EXIT) == 0 || feof(stdin) != 0)
             exit(0);
         else if(strcmp(program, CHDIR) == 0) {
             char * path = arguments[1];
