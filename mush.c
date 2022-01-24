@@ -14,10 +14,12 @@ void tokenize(char **dest, char * src) {
 }
 
 void processInput(char * dest[128]) {
-    char *input = (char *) malloc(MAX_LEN);
+    char input[MAX_LEN];
     fgets(input, MAX_LEN, stdin);
+    if(feof(stdin) != 0) {
+        exit(0);
+    }
     tokenize(dest, input);
-    free(input);
 }
 
 void forkAndExec(char ** args) {
@@ -59,7 +61,6 @@ bool timeToExit(char * command) {
 }
 
 int main(void) {
-    // printf("%s", PROMPT);
     while(1) {
         printf("%s", PROMPT);
         char * arguments[128];
@@ -68,7 +69,7 @@ int main(void) {
 
         if(program == NULL)
             continue;
-        if(timeToExit(program)) {
+        if(strcmp(program, EXIT) == 0) {
             exit(0);
         }
         else if(strcmp(program, CHDIR) == 0) {
@@ -78,6 +79,5 @@ int main(void) {
         else{
             forkAndExec(arguments);
         }
-        printf("%s", PROMPT);
     }
 }
