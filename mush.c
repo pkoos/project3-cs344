@@ -50,7 +50,7 @@ void changeDirectory(char * newDir) {
     }
     int chdir_val = chdir(path);
     if(chdir_val == -1) {
-        perror("Error with chdir");
+        perror("cd");
     }
 }
 
