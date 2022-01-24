@@ -61,6 +61,8 @@ int main(void) {
         processInput(arguments);
         char * program = arguments[0];
 
+        if(program == NULL)
+            continue;
         if(strcmp(program, EXIT) == 0)
             exit(0);
         else if(strcmp(program, CHDIR) == 0) {
