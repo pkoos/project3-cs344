@@ -1,52 +1,73 @@
 #include "mush.h"
 
+void tokenize(char **dest, char * src) {
+    char delim[4] = " \t\n";
+    char * tok = strtok(src, delim);
+    int i = 0;
+    while(tok != NULL) {
+        dest[i] = (char *) malloc(sizeof(char) * strlen(tok));
+
+        strcpy(dest[i++], tok);
+        tok = strtok(NULL, delim);
+    }
+    dest[i] = NULL;
+}
+
+void processInput(char * dest[128]) {
+    char *input = (char *) malloc(MAX_LEN);
+    fgets(input, MAX_LEN, stdin);
+    tokenize(dest, input);
+    free(input);
+}
+
+void forkAndExec(char ** args) {
+    pid_t fork_pid;
+    fork_pid = fork();
+
+    if(fork_pid == 0) {
+        int exec_id = execvp(args[0], args);
+        if (exec_id == -1) {
+            char errorString[ERR_LEN];
+            sprintf(errorString, "[%s] is not a valid command!", args[0]);
+            perror(errorString);
+            exit(1);
+        }
+    }
+    else if(fork_pid == -1) {
+        perror("Error with forking");
+    }
+    else {
+        wait(NULL);
+    }
+}
+
+void changeDirectory(char * newDir) {
+    char path[MAX_LEN];
+    if(newDir == NULL) {
+        strcpy(path, getenv("HOME"));
+    } else {
+        strcpy(path, newDir);
+    }
+    int chdir_val = chdir(path);
+    if(chdir_val == -1) {
+        perror("Error with chdir");
+    }
+}
+
 int main(void) {
     while(1) {
-        printf("%s", prompt);
-        
-        input = (char *) malloc(MAX_LENGTH);
-        fgets(input, MAX_LENGTH, stdin);
-        // printDebug(2, "Input", "Exit", input, EXIT);
-        
-        tokenize(split, input);
+        printf("%s", PROMPT);
+        char * arguments[128];
+        processInput(arguments);
+        char * program = arguments[0];
 
-        // printDebug(1, "split_input[0]", split[0]);
-
-        int exit_comp = strcmp(input, EXIT);
-
-        // sprintf(d_val, "%d", exit_comp);
-        // printDebug(1, "Exit comp", d_val);
-        free(input);
-        if(exit_comp == 0) {
+        if(strcmp(program, EXIT) == 0)
             exit(0);
+        else if(strcmp(program, CHDIR) == 0) {
+            char * path = arguments[1];
+            changeDirectory(path);
         }
-        // printDebug(1, "split[0]", split[0]);
-        fork_pid = fork();
-
-        sprintf(d_val, "%d", fork_pid);
-        printDebug(1, "fork_pid", d_val);
-        if(fork_pid == 0) {
-            if(DEBUG) {
-                printf("Child process here\n");
-            }
-            int exec_id = execvp(split[0], split);
-            if (exec_id == -1) {
-                perror("Error with ExecVP\n");
-                exit(1);
-            }
-
-        }
-        else if(fork_pid == -1) {
-            perror("Error with forking\n");
-        }
-        else {
-            if(DEBUG) {
-                printf("Parent waiting\n");
-            }    
-            wait(NULL);
-        }
-        
+        else
+            forkAndExec(arguments);
     }
-    
-    return 0;
 }
