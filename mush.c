@@ -1,47 +1,51 @@
 #include "mush.h"
 
-void tokenize(char *dest[WORD_COUNT], char * src) {
-    char * tok = strtok(src, DELIM);
-    int i = 0;
-    while(tok != NULL) {
-        dest[i] = (char *) malloc(sizeof(char) * strlen(tok));
-
-        strcpy(dest[i++], tok);
-        tok = strtok(NULL, DELIM);
-    }
-    dest[i] = NULL;
-    if(DEBUG) {
-        for(;i>=0;i--) {
-            printf("Output[%d]: %s\n", i, dest[i]);
-        }
-    }
-}
-
 int main(void) {
     while(1) {
         printf("%s", prompt);
         
         input = (char *) malloc(MAX_LENGTH);
         fgets(input, MAX_LENGTH, stdin);
-        if(DEBUG) {
-            printf("input: %s\nExit: %s\n", input, EXIT);
-        }
+        // printDebug(2, "Input", "Exit", input, EXIT);
+        
         tokenize(split, input);
-        if(DEBUG) {
-            printf("split_input[0]: %s\n", split[0]);
-        }
+
+        // printDebug(1, "split_input[0]", split[0]);
+
         int exit_comp = strcmp(input, EXIT);
-        if(DEBUG) {
-            printf("Exit comp: %d\n", exit_comp);
-        }
+
+        // sprintf(d_val, "%d", exit_comp);
+        // printDebug(1, "Exit comp", d_val);
         free(input);
         if(exit_comp == 0) {
             exit(0);
         }
-        if(DEBUG) {
-            printf("split[0]: %s\n", split[0]);
+        // printDebug(1, "split[0]", split[0]);
+        fork_pid = fork();
+
+        sprintf(d_val, "%d", fork_pid);
+        printDebug(1, "fork_pid", d_val);
+        if(fork_pid == 0) {
+            if(DEBUG) {
+                printf("Child process here\n");
+            }
+            int exec_id = execvp(split[0], split);
+            if (exec_id == -1) {
+                perror("Error with ExecVP\n");
+                exit(1);
+            }
+
         }
-        execvp(split[0], split);
+        else if(fork_pid == -1) {
+            perror("Error with forking\n");
+        }
+        else {
+            if(DEBUG) {
+                printf("Parent waiting\n");
+            }    
+            wait(NULL);
+        }
+        
     }
     
     return 0;
