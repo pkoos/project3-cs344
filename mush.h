@@ -20,9 +20,9 @@
 #define CHDIR "cd"
 
 void tokenize(char **, char *);
+bool isEOF();
 void processInput(char **);
 void forkAndExec(char **);
 void changeDirectory(char *);
-bool timeToExit(char *);
 
 #endif

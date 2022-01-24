@@ -13,12 +13,15 @@ void tokenize(char **dest, char * src) {
     dest[i] = NULL;
 }
 
+bool isEOF() {
+    return feof(stdin) !=0;
+}
+
 void processInput(char * dest[128]) {
     char input[MAX_LEN];
     fgets(input, MAX_LEN, stdin);
-    if(feof(stdin) != 0) {
+    if (isEOF())
         exit(0);
-    }
     tokenize(dest, input);
 }
 
